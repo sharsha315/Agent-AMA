@@ -1,4 +1,5 @@
 import os
+import sqlite3
 from groq import Groq
 from dotenv import load_dotenv
 
@@ -6,7 +7,6 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Initializing GROQ API KEY
-
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
 if not GROQ_API_KEY:
@@ -15,6 +15,7 @@ if not GROQ_API_KEY:
 
 # Initialize Groq client
 client = Groq(api_key=GROQ_API_KEY)
+
 
 completion = client.chat.completions.create(
     model="llama3-8b-8192",
