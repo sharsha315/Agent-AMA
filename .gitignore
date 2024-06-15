@@ -2,3 +2,5 @@
 
 # virtual environment directory
 .venv/
+
+__pycache__

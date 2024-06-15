@@ -1,12 +1,9 @@
 import sqlite3
 
-# Connect to the SQLite database
-conn = sqlite3.connect('northwind.db')
-cursor = conn.cursor()
-
-# Verify the tables
-cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
-tables = cursor.fetchall()
-print("Tables in the database:", tables)
-
-conn.close()
+def execute_query(query):
+    conn = sqlite3.connect('northwind.db')
+    cursor = conn.cursor()
+    cursor.execute(query)
+    results = cursor.fetchall()
+    conn.close()
+    return results
