@@ -1,30 +1,23 @@
-import os
-import sqlite3
+from llm_agent import generate_sql_query, generate_human_readable_response
 import database
-from groq import Groq
-from dotenv import load_dotenv
-from langchain_groq import ChatGroq
-from langchain_core.prompts import ChatPromptTemplate
 
+def main():
+    print("Welcome to Agent AMA!")
+    while True:
+        user_input = input("Ask your question (or type 'exit' to quit): ")
+        if user_input.lower() == 'exit':
+            break
 
-# Load environment variables from .env file
-load_dotenv()
+        # Generate SQL query from user input
+        sql_query = generate_sql_query(user_input)
 
-# Initializing GROQ API KEY
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+        # Execute SQL query and fetch results
+        results = database.execute_query(sql_query)
 
-chat = ChatGroq(
-    temperature=0,
-    model="llama3-70b-8192",
-    api_key=GROQ_API_KEY
-)
+        # Generate human-readable response from SQL query results
+        human_readable_response = generate_human_readable_response(results)
+        
+        print(f"Answer: {human_readable_response}")
 
-system = """You are an skillfull and helpful SQL AI Agent"""
-
-human = """{text}"""
-
-prompt = ChatPromptTemplate.from_messages([("system", system),("human", human)]) 
-
-chain = prompt | chat 
-response = chain.invoke({"text": "Give me the SQL query to find number of items in orders table"})
-print(response.content)
+if __name__ == "__main__":
+    main()
