@@ -26,10 +26,10 @@ db = SQLDatabase.from_uri(f"sqlite:///{db_path}")
 
 # Create SQL Agent - Agent_AMA
 agent_AMA = create_sql_agent(
-    llm,
+    llm=llm,
     db=db, 
     agent_type=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
-    verbose=False
+    verbose=True
 )
 
 # Function to process user query
