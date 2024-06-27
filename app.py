@@ -38,15 +38,12 @@ db = SQLDatabase.from_uri(f"sqlite:///{db_path}")
 
 # Create an Custom SQL Agent - AgentAMA
 
-# Create tools
+# 1. Create tools
 toolkit = SQLDatabaseToolkit(db=db, llm=llm)
 context = toolkit.get_context()
 tools = toolkit.get_tools()
 
-# Initialize agent_scratchpad in the context
-# context = {"agent_scratchpad": []}
-
-# Create ReAct prompt
+# 2. Create ReAct prompt
 examples = """
 Question: Give me the list of tables in this database
 Thought: I need to get the list of tables in the database.
@@ -103,8 +100,7 @@ Only use the below tools. Only use the information returned by the below tools t
 You MUST double check your query before executing it. If you get an error while executing a query, rewrite the query and try again.
 DO NOT make any DML statements (INSERT, UPDATE, DELETE, DROP etc.) to the database.
 If the question does not seem related to the database, just return "I am Sorry, I only answer questions related to the database"  as the answer.
-
-You should return the answer in the following output format:
+if you come across the Final Answer stop processing immediately and return the answer in the following output format:
 
 Question: "Question here"
 SQLQuery: "SQL Query to run"
@@ -144,23 +140,20 @@ prompt = ChatPromptTemplate.from_messages(messages)
 prompt = prompt.partial(**context)
 
 
-# Create Agent
+# 3. Create Agent
 agent = create_react_agent(llm=llm, tools=tools, prompt=prompt)
 
 # Run agent
 agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, handle_parsing_errors=True)
 
-# agent_executor.invoke({"input": user_input})
-
-
 # Main function
 def main():
     print("Welcome!!!")
     print("I am Agent-AMA")
-    user_input = input("Enter your query:")
+    user_input = input("Enter your query: ")
     try:
         result = agent_executor.invoke({"input": user_input})
-        print(result['output'])
+        print("Agent-AMA: ", result['output'])
     except ValueError as e:
         print(f"Error: {e}")
 
