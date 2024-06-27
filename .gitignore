@@ -7,4 +7,3 @@ __pycache__
 
 database.py 
 llm_agent.py 
-main.py 
