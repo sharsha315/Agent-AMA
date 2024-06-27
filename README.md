@@ -46,7 +46,7 @@ Make sure the `northwind.db` file is present in the project directory.
 
 ## Usage
 
-Run the `agentAMA.py` script to start the interactive command-line interface:
+Run the `main.py` script to start the interactive command-line interface:
 ```bash
-python agentAMA.py
+python main.py
 ```
