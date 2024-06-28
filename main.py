@@ -5,7 +5,7 @@ from langchain_community.utilities import SQLDatabase
 from langchain.agents import AgentExecutor, create_react_agent
 from langchain_community.agent_toolkits import SQLDatabaseToolkit
 from langchain_community.agent_toolkits.sql.prompt import SQL_FUNCTIONS_SUFFIX
-from langchain_core.messages import AIMessage
+from langchain.memory import ConversationEntityMemory
 from langchain_core.prompts.chat import (
     ChatPromptTemplate,
     HumanMessagePromptTemplate,
@@ -55,13 +55,7 @@ Only use the below tools. Only use the information returned by the below tools t
 You MUST double check your query before executing it. If you get an error while executing a query, rewrite the query and try again.
 DO NOT make any DML statements (INSERT, UPDATE, DELETE, DROP etc.) to the database.
 If the question does not seem related to the database, just return "I am Sorry, I only answer questions related to the database" as the answer.
-
-If you come across the Final Answer immediately stop Thought, Action Process and return the answer in the following format only:
-
-Question: "Question here"
-SQLQuery: "SQL Query to run"
-SQLResult: "Result of the SQLQuery"
-Answer: "Final answer here"
+If you come across the Final Answer immediately stop Thought, Action Process and return the answer framing a very good sentence.
 
 Answer the following questions as best you can. You have access to the following tools:
 {tools}
@@ -93,6 +87,9 @@ messages = [
 prompt = ChatPromptTemplate.from_messages(messages)
 prompt = prompt.partial(**context)
 
+# Create Memory
+memory = ConversationEntityMemory(llm=llm)
+
 # 3. Create Agent
 agent = create_react_agent(llm=llm, tools=tools, prompt=prompt)
 
@@ -110,8 +107,15 @@ def main():
             print("\nGoodbye!!!\n")
             break
         try:
+            memory.load_memory_variables({"input": "Can you list the tables available in the database?"})
             result = agent_executor.invoke({"input": user_input})
-            print("Agent-AMA: Here are the results,\n\n", result['output'])
+            memory.save_context({"input": result["input"]}, {"output": result["output"]})
+            
+            print()
+            print("****"*10)
+            print(f"\nYou: {result['input']}\nAgent-AMA: {result['output']}")
+            print()
+            print("****"*10)
         except ValueError as e:
             print(f"Error: {e}")
 
